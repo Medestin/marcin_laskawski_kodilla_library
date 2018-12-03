@@ -1,7 +1,9 @@
 package com.kodilla.library.database.services;
 
+import com.kodilla.library.database.entities.BookExemplar;
 import com.kodilla.library.database.entities.BookTitle;
 import com.kodilla.library.database.entities.LibraryUser;
+import com.kodilla.library.database.entities.RentalDao;
 import com.kodilla.library.database.exceptions.ExemplarNotFoundException;
 import com.kodilla.library.database.repositories.BookExemplarRepository;
 import com.kodilla.library.database.repositories.BookTitleRepository;
@@ -12,6 +14,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -36,7 +40,8 @@ public class MainServiceTest {
         Long createdId = user.getId();
 
         LibraryUser fetchedUser =
-                libraryUserRepository.findById(createdId).isPresent() ? libraryUserRepository.findById(createdId).get() : null;
+                libraryUserRepository.findById(createdId)
+                        .isPresent() ? libraryUserRepository.findById(createdId).get() : null;
 
         if (fetchedUser != null) {
             assertEquals(user.getFirstName(), fetchedUser.getFirstName());
@@ -48,18 +53,37 @@ public class MainServiceTest {
 
     @Test
     public void addBook(){
-        BookTitle bookTitle = new BookTitle("Winnetou", "Karol May", 1893);
+        BookTitle bookTitle = new BookTitle("Test title", "Test author", 2000);
         service.addBookTitle(bookTitle);
+
+        Long titleId = service.getTitleId(bookTitle);
+
+        assertEquals("Test title", bookTitleRepository.findById(titleId).get().getTitle());
+
+        List<BookExemplar> exemplars = bookExemplarRepository.findAllByBookTitle_Id(titleId);
+        exemplars.forEach(n-> bookExemplarRepository.deleteById(n.getId()));
+        bookTitleRepository.deleteById(titleId);
     }
 
     @Test
     public void rentABook() throws ExemplarNotFoundException {
-        BookTitle bookTitle = new BookTitle("Last Wish", "Andrzej Sapkowski", 1993);
+        BookTitle bookTitle = new BookTitle("Test title", "Test author", 2000);
+        LibraryUser user = new LibraryUser("Test", "User");
         service.addBookTitle(bookTitle);
-
-        LibraryUser user = new LibraryUser("Michal", "Jakistam");
         service.addUser(user);
 
+        Long titleId = bookTitle.getId();
+        Long userId = user.getId();
         service.rentBook(user, bookTitle);
+
+        List<RentalDao> rentalDaos = rentalDaoRepository.findAllByLibraryUser_Id(userId);
+        assertEquals(1, rentalDaos.size());
+
+        rentalDaos.forEach(rentalDao -> rentalDaoRepository.deleteById(rentalDao.getId()));
+
+        List<BookExemplar> exemplars = bookExemplarRepository.findAllByBookTitle_Id(titleId);
+        exemplars.forEach(n-> bookExemplarRepository.deleteById(n.getId()));
+        bookTitleRepository.deleteById(titleId);
+        libraryUserRepository.deleteById(userId);
     }
 }

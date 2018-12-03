@@ -1,6 +1,9 @@
 package com.kodilla.library.database.services;
 
+import com.kodilla.library.database.entities.BookTitle;
 import com.kodilla.library.database.entities.LibraryUser;
+import com.kodilla.library.database.repositories.BookExemplarRepository;
+import com.kodilla.library.database.repositories.BookTitleRepository;
 import com.kodilla.library.database.repositories.LibraryUserRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,22 +19,33 @@ public class MainServiceTest {
     @Autowired
     private MainService service;
     @Autowired
-    private LibraryUserRepository repository;
+    private LibraryUserRepository libraryUserRepository;
+    @Autowired
+    private BookTitleRepository bookTitleRepository;
+    @Autowired
+    private BookExemplarRepository bookExemplarRepository;
 
     @Test
-    public void createUser() {
+    public void addUser() {
         LibraryUser user = new LibraryUser("Marcin", "Laskawski");
-        service.createUser(user);
+        service.addUser(user);
         Long createdId = user.getId();
 
         LibraryUser fetchedUser =
-                repository.findById(createdId).isPresent() ? repository.findById(createdId).get() : null;
+                libraryUserRepository.findById(createdId).isPresent() ? libraryUserRepository.findById(createdId).get() : null;
 
         if (fetchedUser != null) {
             assertEquals(user.getFirstName(), fetchedUser.getFirstName());
         } else {
             fail();
         }
-        repository.deleteById(createdId);
+        libraryUserRepository.deleteById(createdId);
+    }
+
+    @Test
+    public void addBook(){
+        BookTitle bookTitle = new BookTitle("Winnetou", "Karol May", 1893);
+        service.addBookTitle(bookTitle);
+
     }
 }

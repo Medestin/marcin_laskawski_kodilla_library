@@ -24,6 +24,7 @@ public class BookExemplar {
     private ExemplarStatus status;
 
     @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "bookTitle_id")
     private BookTitle bookTitle;
 
     public BookExemplar(BookTitle bookTitle){

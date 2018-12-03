@@ -2,9 +2,11 @@ package com.kodilla.library.database.services;
 
 import com.kodilla.library.database.entities.BookTitle;
 import com.kodilla.library.database.entities.LibraryUser;
+import com.kodilla.library.database.exceptions.ExemplarNotFoundException;
 import com.kodilla.library.database.repositories.BookExemplarRepository;
 import com.kodilla.library.database.repositories.BookTitleRepository;
 import com.kodilla.library.database.repositories.LibraryUserRepository;
+import com.kodilla.library.database.repositories.RentalDaoRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,8 @@ public class MainServiceTest {
     private BookTitleRepository bookTitleRepository;
     @Autowired
     private BookExemplarRepository bookExemplarRepository;
+    @Autowired
+    private RentalDaoRepository rentalDaoRepository;
 
     @Test
     public void addUser() {
@@ -46,6 +50,16 @@ public class MainServiceTest {
     public void addBook(){
         BookTitle bookTitle = new BookTitle("Winnetou", "Karol May", 1893);
         service.addBookTitle(bookTitle);
+    }
 
+    @Test
+    public void rentABook() throws ExemplarNotFoundException {
+        BookTitle bookTitle = new BookTitle("Last Wish", "Andrzej Sapkowski", 1993);
+        service.addBookTitle(bookTitle);
+
+        LibraryUser user = new LibraryUser("Michal", "Jakistam");
+        service.addUser(user);
+
+        service.rentBook(user, bookTitle);
     }
 }

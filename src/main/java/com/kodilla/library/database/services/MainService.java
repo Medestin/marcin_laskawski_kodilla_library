@@ -42,6 +42,14 @@ public class MainService {
         return users;
     }
 
+    public LibraryUser getUserById(Long id){
+        return libraryUserRepository.findById(id).get();
+    }
+
+    public BookTitle getTitleById(Long id){
+        return bookTitleRepository.findById(id).get();
+    }
+
     public List<BookTitle> getTitles(){
         List<BookTitle> titles = new ArrayList<>();
         bookTitleRepository.findAll().forEach(titles::add);
@@ -71,6 +79,16 @@ public class MainService {
         exemplar.setStatus(ExemplarStatus.RENTED);
         bookExemplarRepository.save(exemplar);
         return rentalDao;
+    }
+
+    public List<BookExemplar> getExemplars(){
+        List<BookExemplar> exemplars = new ArrayList<>();
+        bookExemplarRepository.findAll().forEach(exemplars::add);
+        return exemplars;
+    }
+
+    public BookExemplar getExemplarById(Long id){
+        return bookExemplarRepository.findById(id).get();
     }
 
     public BookExemplar getAvailableExemplar(BookTitle bookTitle) throws ExemplarNotFoundException {
@@ -104,12 +122,13 @@ public class MainService {
         }
     }
 
-    public void changeExemplarStatus(BookExemplar exemplar, ExemplarStatus status){
+    public BookExemplar changeExemplarStatus(BookExemplar exemplar, ExemplarStatus status){
         Optional<BookExemplar> fetchedExemplar = bookExemplarRepository.findById(exemplar.getId());
 
         if(fetchedExemplar.isPresent()){
             fetchedExemplar.get().setStatus(status);
             bookExemplarRepository.save(fetchedExemplar.get());
+            return fetchedExemplar.get();
         } else {
             throw new NoSuchElementException("There is no exemplar with this ID");
         }
@@ -125,5 +144,15 @@ public class MainService {
         } else {
             throw new NoSuchElementException("There is no exemplar with this ID");
         }
+    }
+
+    public List<RentalDao> getRentalDaos(){
+        List<RentalDao> rentalDaos = new ArrayList<>();
+        rentalDaoRepository.findAll().forEach(rentalDaos::add);
+        return rentalDaos;
+    }
+
+    public RentalDao getRentalDaoById(Long id){
+        return rentalDaoRepository.findById(id).get();
     }
 }

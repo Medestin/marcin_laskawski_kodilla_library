@@ -42,7 +42,13 @@ public class MainService {
         return users;
     }
 
-    public void addBookTitle(BookTitle bookTitle){
+    public List<BookTitle> getTitles(){
+        List<BookTitle> titles = new ArrayList<>();
+        bookTitleRepository.findAll().forEach(titles::add);
+        return titles;
+    }
+
+    public BookTitle addBookTitle(BookTitle bookTitle){
         Optional<BookTitle> book = Optional.ofNullable(bookTitleRepository
                 .findByTitleAndAuthorAndPublicationYear(bookTitle.getTitle(), bookTitle.getAuthor(),
                         bookTitle.getPublicationYear()));
@@ -50,9 +56,11 @@ public class MainService {
         if(book.isPresent()){
             BookExemplar exemplar = new BookExemplar(book.get());
             bookExemplarRepository.save(exemplar);
+            return book.get();
         } else {
             bookTitleRepository.save(bookTitle);
             bookExemplarRepository.save(new BookExemplar(bookTitle));
+            return bookTitle;
         }
     }
 

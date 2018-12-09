@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 @Service
 @NoArgsConstructor
@@ -49,12 +50,13 @@ public class MainService {
         }
     }
 
-    public void rentBook(LibraryUser user, BookTitle title) throws ExemplarNotFoundException {
+    public RentalDao rentBook(LibraryUser user, BookTitle title) throws ExemplarNotFoundException {
         BookExemplar exemplar = getAvailableExemplar(title);
         RentalDao rentalDao = new RentalDao(user, exemplar);
         rentalDaoRepository.save(rentalDao);
         exemplar.setStatus(ExemplarStatus.RENTED);
         bookExemplarRepository.save(exemplar);
+        return rentalDao;
     }
 
     public BookExemplar getAvailableExemplar(BookTitle bookTitle) throws ExemplarNotFoundException {
@@ -69,6 +71,13 @@ public class MainService {
         }
     }
 
+    public Long getAvailableExemplarCount(BookTitle bookTitle){
+        Long bookTitleId = getTitleId(bookTitle);
+        List<BookExemplar> books = bookExemplarRepository.findAllByBookTitle_Id(bookTitleId);
+
+        return books.stream().filter(exemplar -> exemplar.getStatus() == ExemplarStatus.AVAILABLE).count();
+    }
+
     public Long getTitleId(BookTitle bookTitle) throws NoSuchElementException {
         Optional<Long> titleId = Optional.ofNullable(bookTitleRepository.findByTitleAndAuthorAndPublicationYear(
                 bookTitle.getTitle(), bookTitle.getAuthor(), bookTitle.getPublicationYear()
@@ -77,7 +86,30 @@ public class MainService {
         if(titleId.isPresent()){
             return titleId.get();
         } else {
-            throw new NoSuchElementException();
+            throw new NoSuchElementException("There is no title with this ID.");
+        }
+    }
+
+    public void changeExemplarStatus(BookExemplar exemplar, ExemplarStatus status){
+        Optional<BookExemplar> fetchedExemplar = bookExemplarRepository.findById(exemplar.getId());
+
+        if(fetchedExemplar.isPresent()){
+            fetchedExemplar.get().setStatus(status);
+            bookExemplarRepository.save(fetchedExemplar.get());
+        } else {
+            throw new NoSuchElementException("There is no exemplar with this ID");
+        }
+    }
+
+    public void returnBook(RentalDao rentalDao){
+        Optional<BookExemplar> fetchedExemplar = bookExemplarRepository.findById(rentalDao.getBookExemplar().getId());
+
+        if(fetchedExemplar.isPresent()){
+            fetchedExemplar.get().setStatus(ExemplarStatus.AVAILABLE);
+            bookExemplarRepository.save(fetchedExemplar.get());
+            rentalDaoRepository.deleteById(rentalDao.getId());
+        } else {
+            throw new NoSuchElementException("There is no exemplar with this ID");
         }
     }
 }

@@ -1,9 +1,6 @@
 package com.kodilla.library.database.services;
 
-import com.kodilla.library.database.entities.BookExemplar;
-import com.kodilla.library.database.entities.BookTitle;
-import com.kodilla.library.database.entities.LibraryUser;
-import com.kodilla.library.database.entities.RentalDao;
+import com.kodilla.library.database.entities.*;
 import com.kodilla.library.database.exceptions.ExemplarNotFoundException;
 import com.kodilla.library.database.repositories.BookExemplarRepository;
 import com.kodilla.library.database.repositories.BookTitleRepository;
@@ -57,7 +54,9 @@ public class MainServiceTest {
         service.addBookTitle(bookTitle);
 
         Long titleId = service.getTitleId(bookTitle);
+        Long exemplarCount = service.getAvailableExemplarCount(bookTitle);
 
+        assertEquals(Long.valueOf(1), exemplarCount);
         assertEquals("Test title", bookTitleRepository.findById(titleId).get().getTitle());
 
         List<BookExemplar> exemplars = bookExemplarRepository.findAllByBookTitle_Id(titleId);
@@ -74,12 +73,37 @@ public class MainServiceTest {
 
         Long titleId = bookTitle.getId();
         Long userId = user.getId();
-        service.rentBook(user, bookTitle);
+        RentalDao rentalDao = service.rentBook(user, bookTitle);
 
         List<RentalDao> rentalDaos = rentalDaoRepository.findAllByLibraryUser_Id(userId);
         assertEquals(1, rentalDaos.size());
 
-        rentalDaos.forEach(rentalDao -> rentalDaoRepository.deleteById(rentalDao.getId()));
+        service.returnBook(rentalDao);
+        rentalDaos = rentalDaoRepository.findAllByLibraryUser_Id(userId);
+        assertTrue(rentalDaos.isEmpty());
+
+
+        List<BookExemplar> exemplars = bookExemplarRepository.findAllByBookTitle_Id(titleId);
+        exemplars.forEach(n-> bookExemplarRepository.deleteById(n.getId()));
+        bookTitleRepository.deleteById(titleId);
+        libraryUserRepository.deleteById(userId);
+    }
+
+    @Test
+    public void changeExemplarStatus() throws ExemplarNotFoundException {
+        BookTitle bookTitle = new BookTitle("Test title", "Test author", 2000);
+        LibraryUser user = new LibraryUser("Test", "User");
+        service.addBookTitle(bookTitle);
+        service.addUser(user);
+
+        BookExemplar fetchedExemplar = service.getAvailableExemplar(bookTitle);
+
+        Long titleId = bookTitle.getId();
+        Long userId = user.getId();
+        Long exemplarID = fetchedExemplar.getId();
+
+        service.changeExemplarStatus(fetchedExemplar, ExemplarStatus.LOST);
+        assertEquals(ExemplarStatus.LOST, bookExemplarRepository.findById(exemplarID).get().getStatus());
 
         List<BookExemplar> exemplars = bookExemplarRepository.findAllByBookTitle_Id(titleId);
         exemplars.forEach(n-> bookExemplarRepository.deleteById(n.getId()));

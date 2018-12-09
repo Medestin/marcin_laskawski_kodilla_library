@@ -10,10 +10,10 @@ import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.stream.IntStream;
 
 @Service
 @NoArgsConstructor
@@ -32,8 +32,14 @@ public class MainService {
         this.rentalDaoRepository = rentalDaoRepository;
     }
 
-    public void addUser(LibraryUser user){
-        libraryUserRepository.save(user);
+    public LibraryUser addUser(LibraryUser user){
+        return libraryUserRepository.save(user);
+    }
+
+    public List<LibraryUser> getUsers(){
+        List<LibraryUser> users = new ArrayList<>();
+        libraryUserRepository.findAll().forEach(users::add);
+        return users;
     }
 
     public void addBookTitle(BookTitle bookTitle){

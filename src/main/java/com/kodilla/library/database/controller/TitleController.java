@@ -1,7 +1,7 @@
 package com.kodilla.library.database.controller;
 
 import com.kodilla.library.database.entities.BookTitle;
-import com.kodilla.library.database.services.MainService;
+import com.kodilla.library.database.services.LibraryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,21 +12,21 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RestController
 @RequestMapping("/titles")
 public class TitleController {
-    private MainService mainService;
+    private LibraryService libraryService;
 
     @Autowired
-    public TitleController(MainService mainService) {
-        this.mainService = mainService;
+    public TitleController(LibraryService libraryService) {
+        this.libraryService = libraryService;
     }
 
     @GetMapping("/")
     public List<BookTitle> getTitles(){
-        return mainService.getTitles();
+        return libraryService.getTitles();
     }
 
     @PostMapping(value = "/", consumes = APPLICATION_JSON_VALUE)
     public BookTitle addBook(@RequestBody BookTitle bookTitle){
-        return mainService.addBookTitle(bookTitle);
+        return libraryService.addBookTitle(bookTitle);
     }
 
 }

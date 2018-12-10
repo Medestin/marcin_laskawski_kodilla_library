@@ -1,7 +1,7 @@
 package com.kodilla.library.database.controller;
 
 import com.kodilla.library.database.entities.LibraryUser;
-import com.kodilla.library.database.services.MainService;
+import com.kodilla.library.database.services.LibraryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,20 +12,20 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RestController
 @RequestMapping("/users")
 public class UserController {
-    private MainService mainService;
+    private LibraryService libraryService;
 
     @Autowired
-    public UserController(MainService mainService) {
-        this.mainService = mainService;
+    public UserController(LibraryService libraryService) {
+        this.libraryService = libraryService;
     }
 
     @GetMapping("/")
     public List<LibraryUser> getUsers(){
-        return mainService.getUsers();
+        return libraryService.getUsers();
     }
 
     @PostMapping(value = "/", consumes = APPLICATION_JSON_VALUE)
     public LibraryUser addUser(@RequestBody LibraryUser user){
-        return mainService.addUser(user);
+        return libraryService.addUser(user);
     }
 }

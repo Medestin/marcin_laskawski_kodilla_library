@@ -2,7 +2,7 @@ package com.kodilla.library.database.controller;
 
 import com.kodilla.library.database.entities.*;
 import com.kodilla.library.database.exceptions.ExemplarNotFoundException;
-import com.kodilla.library.database.services.MainService;
+import com.kodilla.library.database.services.LibraryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,40 +11,40 @@ import java.util.List;
 @RestController
 @RequestMapping("/exemplars")
 public class ExemplarController {
-    private MainService mainService;
+    private LibraryService libraryService;
 
     @Autowired
-    public ExemplarController(MainService mainService) {
-        this.mainService = mainService;
+    public ExemplarController(LibraryService libraryService) {
+        this.libraryService = libraryService;
     }
 
     @GetMapping("/")
     public List<BookExemplar> getExemplars(){
-        return mainService.getExemplars();
+        return libraryService.getExemplars();
     }
 
     @GetMapping("/count")
     public Long getExemplarCount(@RequestParam Long bookTitleId){
-        return mainService.getAvailableExemplarCount(bookTitleId);
+        return libraryService.getAvailableExemplarCount(bookTitleId);
     }
 
     @PutMapping("/status")
     public BookExemplar changeExemplarStatus(@RequestParam Long exemplarId, @RequestParam ExemplarStatus status){
-        return mainService.changeExemplarStatus(exemplarId, status);
+        return libraryService.changeExemplarStatus(exemplarId, status);
     }
 
     @PutMapping("/rent")
     public RentalDao rentABook(@RequestParam Long userId, @RequestParam Long titleId) throws ExemplarNotFoundException {
-        return mainService.rentBook(userId, titleId);
+        return libraryService.rentBook(userId, titleId);
     }
 
     @PutMapping("/return")
     public void returnBook(@RequestParam Long rentalDaoId){
-        mainService.returnBook(rentalDaoId);
+        libraryService.returnBook(rentalDaoId);
     }
 
     @GetMapping("rentals")
     public List<RentalDao> getRentals(){
-        return mainService.getRentalDaos();
+        return libraryService.getRentalDaos();
     }
 }

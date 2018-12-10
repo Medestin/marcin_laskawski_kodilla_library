@@ -18,9 +18,9 @@ import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class MainServiceTest {
+public class LibraryServiceTest {
     @Autowired
-    private MainService service;
+    private LibraryService service;
     @Autowired
     private LibraryUserRepository libraryUserRepository;
     @Autowired

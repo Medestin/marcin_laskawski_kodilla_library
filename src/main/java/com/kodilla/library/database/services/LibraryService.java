@@ -14,15 +14,15 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
-public class MainService {
+public class LibraryService {
     private LibraryUserRepository libraryUserRepository;
     private BookTitleRepository bookTitleRepository;
     private BookExemplarRepository bookExemplarRepository;
     private RentalDaoRepository rentalDaoRepository;
 
     @Autowired
-    public MainService(LibraryUserRepository libraryUserRepository, BookTitleRepository bookTitleRepository,
-                       BookExemplarRepository bookExemplarRepository, RentalDaoRepository rentalDaoRepository) {
+    public LibraryService(LibraryUserRepository libraryUserRepository, BookTitleRepository bookTitleRepository,
+                          BookExemplarRepository bookExemplarRepository, RentalDaoRepository rentalDaoRepository) {
         this.libraryUserRepository = libraryUserRepository;
         this.bookTitleRepository = bookTitleRepository;
         this.bookExemplarRepository = bookExemplarRepository;

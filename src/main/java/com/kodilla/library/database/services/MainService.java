@@ -6,17 +6,14 @@ import com.kodilla.library.database.repositories.BookExemplarRepository;
 import com.kodilla.library.database.repositories.BookTitleRepository;
 import com.kodilla.library.database.repositories.LibraryUserRepository;
 import com.kodilla.library.database.repositories.RentalDaoRepository;
-import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
-@NoArgsConstructor
 public class MainService {
     private LibraryUserRepository libraryUserRepository;
     private BookTitleRepository bookTitleRepository;
@@ -37,23 +34,30 @@ public class MainService {
     }
 
     public List<LibraryUser> getUsers(){
-        List<LibraryUser> users = new ArrayList<>();
-        libraryUserRepository.findAll().forEach(users::add);
-        return users;
+        return libraryUserRepository.findAll();
     }
 
     public LibraryUser getUserById(Long id){
-        return libraryUserRepository.findById(id).get();
+        Optional<LibraryUser> libraryUser = libraryUserRepository.findById(id);
+        if(libraryUser.isPresent()){
+            return libraryUser.get();
+        } else {
+            throw new NoSuchElementException("There is no user with this ID");
+        }
     }
 
     public BookTitle getTitleById(Long id){
-        return bookTitleRepository.findById(id).get();
+        Optional<BookTitle> bookTitle = bookTitleRepository.findById(id);
+
+        if(bookTitle.isPresent()){
+            return bookTitle.get();
+        } else {
+            throw new NoSuchElementException("There is no user with this ID");
+        }
     }
 
     public List<BookTitle> getTitles(){
-        List<BookTitle> titles = new ArrayList<>();
-        bookTitleRepository.findAll().forEach(titles::add);
-        return titles;
+        return bookTitleRepository.findAll();
     }
 
     public BookTitle addBookTitle(BookTitle bookTitle){
@@ -72,27 +76,22 @@ public class MainService {
         }
     }
 
-    public RentalDao rentBook(LibraryUser user, BookTitle title) throws ExemplarNotFoundException {
-        BookExemplar exemplar = getAvailableExemplar(title);
-        RentalDao rentalDao = new RentalDao(user, exemplar);
-        rentalDaoRepository.save(rentalDao);
-        exemplar.setStatus(ExemplarStatus.RENTED);
-        bookExemplarRepository.save(exemplar);
-        return rentalDao;
-    }
-
     public List<BookExemplar> getExemplars(){
-        List<BookExemplar> exemplars = new ArrayList<>();
-        bookExemplarRepository.findAll().forEach(exemplars::add);
-        return exemplars;
+        return bookExemplarRepository.findAll();
     }
 
     public BookExemplar getExemplarById(Long id){
-        return bookExemplarRepository.findById(id).get();
+        Optional<BookExemplar> bookExemplar = bookExemplarRepository.findById(id);
+
+        if(bookExemplar.isPresent()){
+            return bookExemplar.get();
+        } else {
+            throw new NoSuchElementException("There is no bookExemplar with this ID");
+        }
+
     }
 
-    public BookExemplar getAvailableExemplar(BookTitle bookTitle) throws ExemplarNotFoundException {
-        Long bookTitleId = getTitleId(bookTitle);
+    public BookExemplar getAvailableExemplar(Long bookTitleId) throws ExemplarNotFoundException {
         List<BookExemplar> books = bookExemplarRepository.findAllByBookTitle_Id(bookTitleId);
         Optional<BookExemplar> exemplar = books.stream().filter(book -> book.getStatus() == ExemplarStatus.AVAILABLE)
                 .findFirst();
@@ -103,27 +102,14 @@ public class MainService {
         }
     }
 
-    public Long getAvailableExemplarCount(BookTitle bookTitle){
-        Long bookTitleId = getTitleId(bookTitle);
+    public Long getAvailableExemplarCount(Long bookTitleId){
         List<BookExemplar> books = bookExemplarRepository.findAllByBookTitle_Id(bookTitleId);
 
         return books.stream().filter(exemplar -> exemplar.getStatus() == ExemplarStatus.AVAILABLE).count();
     }
 
-    public Long getTitleId(BookTitle bookTitle) throws NoSuchElementException {
-        Optional<Long> titleId = Optional.ofNullable(bookTitleRepository.findByTitleAndAuthorAndPublicationYear(
-                bookTitle.getTitle(), bookTitle.getAuthor(), bookTitle.getPublicationYear()
-        ).getId());
-
-        if(titleId.isPresent()){
-            return titleId.get();
-        } else {
-            throw new NoSuchElementException("There is no title with this ID.");
-        }
-    }
-
-    public BookExemplar changeExemplarStatus(BookExemplar exemplar, ExemplarStatus status){
-        Optional<BookExemplar> fetchedExemplar = bookExemplarRepository.findById(exemplar.getId());
+    public BookExemplar changeExemplarStatus(Long exemplarId, ExemplarStatus status){
+        Optional<BookExemplar> fetchedExemplar = bookExemplarRepository.findById(exemplarId);
 
         if(fetchedExemplar.isPresent()){
             fetchedExemplar.get().setStatus(status);
@@ -134,7 +120,32 @@ public class MainService {
         }
     }
 
-    public void returnBook(RentalDao rentalDao){
+    public List<RentalDao> getRentalDaos(){
+        return rentalDaoRepository.findAll();
+    }
+
+    public RentalDao getRentalDaoById(Long id){
+        Optional<RentalDao> rentalDao = rentalDaoRepository.findById(id);
+
+        if(rentalDao.isPresent()){
+            return rentalDao.get();
+        } else {
+            throw new NoSuchElementException("There is no rentalDao with this ID");
+        }
+    }
+
+    public RentalDao rentBook(Long userId, Long titleId) throws ExemplarNotFoundException {
+        BookExemplar exemplar = getAvailableExemplar(titleId);
+        RentalDao rentalDao = new RentalDao(getUserById(userId), exemplar);
+
+        exemplar.setStatus(ExemplarStatus.RENTED);
+        rentalDaoRepository.save(rentalDao);
+        bookExemplarRepository.save(exemplar);
+        return rentalDao;
+    }
+
+    public void returnBook(Long rentalDaoId){
+        RentalDao rentalDao = getRentalDaoById(rentalDaoId);
         Optional<BookExemplar> fetchedExemplar = bookExemplarRepository.findById(rentalDao.getBookExemplar().getId());
 
         if(fetchedExemplar.isPresent()){
@@ -144,15 +155,5 @@ public class MainService {
         } else {
             throw new NoSuchElementException("There is no exemplar with this ID");
         }
-    }
-
-    public List<RentalDao> getRentalDaos(){
-        List<RentalDao> rentalDaos = new ArrayList<>();
-        rentalDaoRepository.findAll().forEach(rentalDaos::add);
-        return rentalDaos;
-    }
-
-    public RentalDao getRentalDaoById(Long id){
-        return rentalDaoRepository.findById(id).get();
     }
 }

@@ -4,7 +4,6 @@ import com.kodilla.library.database.entities.*;
 import com.kodilla.library.database.exceptions.ExemplarNotFoundException;
 import com.kodilla.library.database.services.MainService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,30 +24,27 @@ public class ExemplarController {
     }
 
     @GetMapping("/count")
-    public Long getExemplarCount(@RequestBody BookTitle bookTitle){
-        return mainService.getAvailableExemplarCount(bookTitle);
+    public Long getExemplarCount(@RequestParam Long bookTitleId){
+        return mainService.getAvailableExemplarCount(bookTitleId);
+    }
+
+    @PutMapping("/status")
+    public BookExemplar changeExemplarStatus(@RequestParam Long exemplarId, @RequestParam ExemplarStatus status){
+        return mainService.changeExemplarStatus(exemplarId, status);
+    }
+
+    @PutMapping("/rent")
+    public RentalDao rentABook(@RequestParam Long userId, @RequestParam Long titleId) throws ExemplarNotFoundException {
+        return mainService.rentBook(userId, titleId);
+    }
+
+    @PutMapping("/return")
+    public void returnBook(@RequestParam Long rentalDaoId){
+        mainService.returnBook(rentalDaoId);
     }
 
     @GetMapping("rentals")
     public List<RentalDao> getRentals(){
         return mainService.getRentalDaos();
-    }
-
-    @PutMapping("/status")
-    public BookExemplar changeExemplarStatus(@RequestParam Long exemplarId, @RequestParam ExemplarStatus status){
-        return mainService.changeExemplarStatus(mainService.getExemplarById(exemplarId), status);
-    }
-
-    @PutMapping("/rent")
-    public RentalDao rentABook(@RequestParam Long userId, @RequestParam Long titleId) throws ExemplarNotFoundException {
-        LibraryUser user = mainService.getUserById(userId);
-        BookTitle title = mainService.getTitleById(titleId);
-        return mainService.rentBook(user, title);
-    }
-
-    @PutMapping("/return/{id}")
-    public void returnBook(@PathVariable("id") Long rentalDaoId){
-        RentalDao rentalDao = mainService.getRentalDaoById(rentalDaoId);
-        mainService.returnBook(rentalDao);
     }
 }

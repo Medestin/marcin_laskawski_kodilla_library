@@ -33,7 +33,7 @@ public class BookTitle {
     @NotNull
     private int publicationYear;
 
-    public BookTitle(@NotNull @Length(min = 3, max = 30) String title, @NotNull String author, @NotNull int publicationYear) {
+    public BookTitle(String title, String author, int publicationYear) {
         this.title = title;
         this.author = author;
         this.publicationYear = publicationYear;

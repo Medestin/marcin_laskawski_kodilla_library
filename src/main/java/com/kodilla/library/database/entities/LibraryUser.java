@@ -3,12 +3,12 @@ package com.kodilla.library.database.entities;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.validator.constraints.Length;
-import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.sql.Timestamp;
 
 @Data
 @Entity
@@ -30,18 +30,11 @@ public class LibraryUser {
     @Length(min = 3, max = 20)
     private String lastName;
 
-    @NotNull
-    @CreatedDate
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date creationDate;
+    @CreationTimestamp
+    private Timestamp creationTimestamp;
 
-    public LibraryUser(@NotNull @Length(min = 3, max = 10) String firstName, @NotNull @Length(min = 3, max = 20) String lastName) {
+    public LibraryUser(String firstName, String lastName) {
         this.firstName = firstName;
         this.lastName = lastName;
-    }
-
-    @PrePersist
-    public void onCreate(){
-        this.creationDate = new Date();
     }
 }

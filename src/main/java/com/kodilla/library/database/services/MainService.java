@@ -39,6 +39,7 @@ public class MainService {
 
     public LibraryUser getUserById(Long id){
         Optional<LibraryUser> libraryUser = libraryUserRepository.findById(id);
+
         if(libraryUser.isPresent()){
             return libraryUser.get();
         } else {
@@ -88,13 +89,13 @@ public class MainService {
         } else {
             throw new NoSuchElementException("There is no bookExemplar with this ID");
         }
-
     }
 
     public BookExemplar getAvailableExemplar(Long bookTitleId) throws ExemplarNotFoundException {
         List<BookExemplar> books = bookExemplarRepository.findAllByBookTitle_Id(bookTitleId);
         Optional<BookExemplar> exemplar = books.stream().filter(book -> book.getStatus() == ExemplarStatus.AVAILABLE)
                 .findFirst();
+
         if(exemplar.isPresent()){
             return exemplar.get();
         } else {

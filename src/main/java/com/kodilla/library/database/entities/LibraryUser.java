@@ -1,8 +1,6 @@
 package com.kodilla.library.database.entities;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.validator.constraints.Length;
 
@@ -12,8 +10,6 @@ import java.sql.Timestamp;
 
 @Data
 @Entity
-@NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "users")
 public class LibraryUser {
 
@@ -32,6 +28,9 @@ public class LibraryUser {
 
     @CreationTimestamp
     private Timestamp creationTimestamp;
+
+    public LibraryUser() {
+    }
 
     public LibraryUser(String firstName, String lastName) {
         this.firstName = firstName;

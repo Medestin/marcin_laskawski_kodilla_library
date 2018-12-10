@@ -1,8 +1,6 @@
 package com.kodilla.library.database.entities;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
@@ -13,8 +11,6 @@ import java.util.Date;
 
 @Data
 @Entity
-@NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "rental_data")
 public class RentalDao implements Serializable {
 
@@ -38,6 +34,9 @@ public class RentalDao implements Serializable {
 
     @NotNull
     private Date returnDeadline;
+
+    public RentalDao() {
+    }
 
     public RentalDao(LibraryUser user, BookExemplar exemplar){
         this.libraryUser = user;

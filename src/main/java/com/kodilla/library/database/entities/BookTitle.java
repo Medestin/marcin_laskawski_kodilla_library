@@ -1,8 +1,6 @@
 package com.kodilla.library.database.entities;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.Entity;
@@ -13,8 +11,6 @@ import javax.validation.constraints.NotNull;
 
 @Data
 @Entity
-@NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "books")
 public class BookTitle {
 
@@ -32,6 +28,9 @@ public class BookTitle {
 
     @NotNull
     private int publicationYear;
+
+    public BookTitle() {
+    }
 
     public BookTitle(String title, String author, int publicationYear) {
         this.title = title;

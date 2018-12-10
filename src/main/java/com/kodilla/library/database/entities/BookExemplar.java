@@ -1,16 +1,12 @@
 package com.kodilla.library.database.entities;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Data
 @Entity
-@NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "exemplars")
 public class BookExemplar {
 
@@ -26,6 +22,9 @@ public class BookExemplar {
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "bookTitle_id")
     private BookTitle bookTitle;
+
+    public BookExemplar() {
+    }
 
     public BookExemplar(BookTitle bookTitle){
         this.bookTitle = bookTitle;

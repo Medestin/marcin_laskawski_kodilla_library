@@ -23,6 +23,11 @@ public class ExemplarController {
         return libraryService.getExemplars();
     }
 
+    @GetMapping("/get")
+    public BookExemplar getExemplarById(@RequestParam Long exemplarId){
+        return libraryService.getExemplarById(exemplarId);
+    }
+
     @GetMapping("/count")
     public Long getExemplarCount(@RequestParam Long bookTitleId){
         return libraryService.getAvailableExemplarCount(bookTitleId);

@@ -1,24 +1,20 @@
 package com.kodilla.library.database.services;
 
 import com.kodilla.library.database.entities.*;
-import com.kodilla.library.database.exceptions.ExemplarNotFoundException;
-import com.kodilla.library.database.repositories.BookExemplarRepository;
-import com.kodilla.library.database.repositories.BookTitleRepository;
-import com.kodilla.library.database.repositories.LibraryUserRepository;
-import com.kodilla.library.database.repositories.RentalDaoRepository;
+import com.kodilla.library.database.exceptions.*;
+import com.kodilla.library.database.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
 public class LibraryService {
-    private LibraryUserRepository libraryUserRepository;
-    private BookTitleRepository bookTitleRepository;
-    private BookExemplarRepository bookExemplarRepository;
-    private RentalDaoRepository rentalDaoRepository;
+    private final LibraryUserRepository libraryUserRepository;
+    private final BookTitleRepository bookTitleRepository;
+    private final BookExemplarRepository bookExemplarRepository;
+    private final RentalDaoRepository rentalDaoRepository;
 
     @Autowired
     public LibraryService(LibraryUserRepository libraryUserRepository, BookTitleRepository bookTitleRepository,
@@ -43,7 +39,7 @@ public class LibraryService {
         if(libraryUser.isPresent()){
             return libraryUser.get();
         } else {
-            throw new NoSuchElementException("There is no user with this ID");
+            throw new UserNotFoundException();
         }
     }
 
@@ -53,7 +49,7 @@ public class LibraryService {
         if(bookTitle.isPresent()){
             return bookTitle.get();
         } else {
-            throw new NoSuchElementException("There is no user with this ID");
+            throw new BookTitleNotFoundException();
         }
     }
 
@@ -87,11 +83,11 @@ public class LibraryService {
         if(bookExemplar.isPresent()){
             return bookExemplar.get();
         } else {
-            throw new NoSuchElementException("There is no bookExemplar with this ID");
+            throw new ExemplarNotFoundException();
         }
     }
 
-    public BookExemplar getAvailableExemplar(Long bookTitleId) throws ExemplarNotFoundException {
+    public BookExemplar getAvailableExemplar(Long bookTitleId) {
         List<BookExemplar> books = bookExemplarRepository.findAllByBookTitle_Id(bookTitleId);
         Optional<BookExemplar> exemplar = books.stream().filter(book -> book.getStatus() == ExemplarStatus.AVAILABLE)
                 .findFirst();
@@ -117,7 +113,7 @@ public class LibraryService {
             bookExemplarRepository.save(fetchedExemplar.get());
             return fetchedExemplar.get();
         } else {
-            throw new NoSuchElementException("There is no exemplar with this ID");
+            throw new ExemplarNotFoundException();
         }
     }
 
@@ -131,11 +127,11 @@ public class LibraryService {
         if(rentalDao.isPresent()){
             return rentalDao.get();
         } else {
-            throw new NoSuchElementException("There is no rentalDao with this ID");
+            throw new RentalDaoNotFoundException();
         }
     }
 
-    public RentalDao rentBook(Long userId, Long titleId) throws ExemplarNotFoundException {
+    public RentalDao rentBook(Long userId, Long titleId) {
         BookExemplar exemplar = getAvailableExemplar(titleId);
         RentalDao rentalDao = new RentalDao(getUserById(userId), exemplar);
 
@@ -154,7 +150,7 @@ public class LibraryService {
             bookExemplarRepository.save(fetchedExemplar.get());
             rentalDaoRepository.deleteById(rentalDao.getId());
         } else {
-            throw new NoSuchElementException("There is no exemplar with this ID");
+            throw new ExemplarNotFoundException();
         }
     }
 }

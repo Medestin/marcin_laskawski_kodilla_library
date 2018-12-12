@@ -1,5 +1,6 @@
 package com.kodilla.library.database.entities;
 
+import com.kodilla.library.database.entities.exemplarStatus.ExemplarStatus;
 import lombok.Data;
 
 import javax.persistence.*;

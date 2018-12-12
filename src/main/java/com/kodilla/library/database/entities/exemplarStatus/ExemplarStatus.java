@@ -1,4 +1,4 @@
-package com.kodilla.library.database.entities;
+package com.kodilla.library.database.entities.exemplarStatus;
 
 public enum ExemplarStatus {
     AVAILABLE,

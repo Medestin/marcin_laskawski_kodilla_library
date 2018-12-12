@@ -1,6 +1,7 @@
 package com.kodilla.library.database.services;
 
 import com.kodilla.library.database.entities.*;
+import com.kodilla.library.database.entities.exemplarStatus.ExemplarStatus;
 import com.kodilla.library.database.repositories.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -1,6 +1,7 @@
 package com.kodilla.library.database.services;
 
 import com.kodilla.library.database.entities.*;
+import com.kodilla.library.database.entities.exemplarStatus.ExemplarStatus;
 import com.kodilla.library.database.exceptions.*;
 import com.kodilla.library.database.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;

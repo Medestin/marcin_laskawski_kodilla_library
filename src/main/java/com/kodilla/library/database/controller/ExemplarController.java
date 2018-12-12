@@ -1,7 +1,6 @@
 package com.kodilla.library.database.controller;
 
 import com.kodilla.library.database.entities.*;
-import com.kodilla.library.database.exceptions.ExemplarNotFoundException;
 import com.kodilla.library.database.services.LibraryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -23,28 +22,30 @@ public class ExemplarController {
         return libraryService.getExemplars();
     }
 
-    @GetMapping("/get")
-    public BookExemplar getExemplarById(@RequestParam Long exemplarId){
+    @GetMapping("/{id}/get")
+    public BookExemplar getExemplarById(@PathVariable(name = "id") Long exemplarId){
         return libraryService.getExemplarById(exemplarId);
     }
 
-    @GetMapping("/count")
-    public Long getExemplarCount(@RequestParam Long bookTitleId){
+    @GetMapping("/{id}/count")
+    public Long getExemplarCount(@PathVariable(name = "id") Long bookTitleId){
         return libraryService.getAvailableExemplarCount(bookTitleId);
     }
 
-    @PutMapping("/status")
-    public BookExemplar changeExemplarStatus(@RequestParam Long exemplarId, @RequestParam ExemplarStatus status){
+    @PutMapping("/{id}/{status}/change")
+    public BookExemplar changeExemplarStatus(@PathVariable(name = "id") Long exemplarId,
+                                             @PathVariable(name = "status") ExemplarStatus status){
         return libraryService.changeExemplarStatus(exemplarId, status);
     }
 
-    @PutMapping("/rent")
-    public RentalDao rentABook(@RequestParam Long userId, @RequestParam Long titleId) throws ExemplarNotFoundException {
+    @PutMapping("/{userId}/{titleId}/rent")
+    public RentalDao rentABook(@PathVariable(name = "userId") Long userId,
+                               @PathVariable(name = "titleId") Long titleId) {
         return libraryService.rentBook(userId, titleId);
     }
 
-    @PutMapping("/return")
-    public void returnBook(@RequestParam Long rentalDaoId){
+    @PutMapping("/{id}/return")
+    public void returnBook(@PathVariable(name = "id") Long rentalDaoId){
         libraryService.returnBook(rentalDaoId);
     }
 
